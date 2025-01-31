@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "179575745122",
+    "project_id": "setingapp-27705",
+    "storage_bucket": "setingapp-27705.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:179575745122:android:3e17eec228d0e37b907f3b",
+        "android_client_info": {
+          "package_name": "com.example.seting_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCq6PvNeY_WWg1FWac5NvjVDFxrzOO4Xg8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
