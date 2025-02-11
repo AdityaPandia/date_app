@@ -155,11 +155,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           );
                           if (loginResponse != null &&
                               loginResponse.success == true) {
-                            // Save tokens to SharedPreferences
-                            await prefs.setString(
-                              SharedPrefsKeys.accessToken,
-                              loginResponse.data?.accessToken ?? '',
-                            );
+
                             await prefs.setString(
                               SharedPrefsKeys.userId,
                               loginResponse.data?.id ?? '',

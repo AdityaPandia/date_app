@@ -25,7 +25,6 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _checkLoginStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool isLoggedIn = prefs.getBool(SharedPrefsKeys.isLoggedIn) ?? false;
-
     if (isLoggedIn) {
       print("User Logged In : ${isLoggedIn}");
       Navigator.pushReplacementNamed(context, Routes.dashBoard);
@@ -33,6 +32,8 @@ class _SplashScreenState extends State<SplashScreen> {
       Timer(Duration(seconds: 2), () {
         Navigator.pushNamedAndRemoveUntil(
             context, Routes.signIn, (Route<dynamic> route) => false);
+        // Navigator.pushNamedAndRemoveUntil(
+        //     context, Routes.signIn, (Route<dynamic> route) => false);
       }
           //   Navigator.pushNamed(
           //     context, Routes.tutorial,

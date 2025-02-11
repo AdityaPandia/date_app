@@ -52,14 +52,17 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   }
 
   getAllUserData() async {
-    print("Access Token: $accessToken");
+    print("Access Token hhgh: $accessToken");
     EasyLoading.show();
     AllUsersResponse? userModel = await WebConfig.getAllUsers(
       accessToken: accessToken ?? "",
     );
     EasyLoading.dismiss();
 
-    if (userModel != null && userModel.success == true && userModel.data != null && userModel.data!.isNotEmpty) {
+    if (userModel != null &&
+        userModel.success == true &&
+        userModel.data != null &&
+        userModel.data!.isNotEmpty) {
       setState(() {
         allUserData = userModel;
       });
@@ -67,7 +70,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     } else {
       print("Failed to get all user data or data is empty.");
       setState(() {
-        allUserData = AllUsersResponse();  // Set a default empty value
+        allUserData = AllUsersResponse(); // Set a default empty value
       });
     }
   }
@@ -133,55 +136,84 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              SizedBox(height: MediaQuery.of(context).size.height*0.01,),
               allUserData.data == null || allUserData.data!.isEmpty
-                  ? Center(child: Text("No users available."))
-                  :   SizedBox(
-                height: MediaQuery.of(context).size.height * .70,
+                  ? Center(child: Text("No users available nearby"))
+                  : Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(
                     left: 25,
                     right: 25,
-                    top: 10,
+                   // top: 10,
                     bottom: 40,
                   ),
-                  child: AppinioSwiper(
-                    controller: controller,
-                    invertAngleOnBottomDrag: true,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 30), // Push the whole stack down
+                   // child:AppinioSwiper(
+                   //   controller: controller,
+                   //   backgroundCardCount: 1, // Keep one background card
+                   //   backgroundCardOffset: Offset(0, -MediaQuery.of(context).size.height * 0.02), // Slightly shift background card
+                   //  // swipeOptions: const SwipeOptions.all(),
+                   //   /// ✅ Disable UP & DOWN swipes, allow only LEFT & RIGHT
+                   //   swipeOptions: const SwipeOptions.only(
+                   //     left: true,
+                   //     right: true,
+                   //     up: false,
+                   //     down: false,
+                   //   ),
+                   //   onSwipeEnd: _swipeEnd,
+                   //   onEnd: _onEnd,
+                   //   cardCount: allUserData.data?.length ?? 0,
+                   //   cardBuilder: (BuildContext context, int index) {
+                   //     return ExampleCard(allUserData: allUserData.data?[index]);
+                   //   },
+                   // ),
+                    child: AppinioSwiper(
+                      controller: controller,
+                      backgroundCardCount: 1,
+                      backgroundCardOffset: Offset(0, -MediaQuery.of(context).size.height * 0.05),
+                      swipeOptions: const SwipeOptions.only(
+                        left: true,
+                        right: true,
+                        up: false,
+                        down: false,
+                      ),
+                      onSwipeEnd: _swipeEnd,
+                      onEnd: _onEnd,
+                      cardCount: allUserData.data?.length ?? 0,
+                      cardBuilder: (BuildContext context, int index) {
+                        return ExampleCard(
+                          allUserData: allUserData.data?[index],
+                          isActive: index == 0, // ✅ Set `isActive` true only for the top card
+                        );
+                      },
+                    ),
 
-                    backgroundCardCount: allUserData.data?.length ?? 0,
-                    swipeOptions: const SwipeOptions.all(),
-                    onCardPositionChanged: (
-                      SwiperPosition position,
-                    ) {},
-                    onSwipeEnd: _swipeEnd,
-                    onEnd: _onEnd,
-                    cardCount: allUserData.data?.length ?? 0,
-                    cardBuilder: (BuildContext context, int index) {
-                      //   return ExampleCard(availableMatch: allUserData.data?[index] );
-                      return ExampleCard(
-                        //  availableMatch: candidates[index],
-                          allUserData: allUserData.data?[index]);
-                    },
-                  ),
+
+
+                  )
                 ),
               ),
-
-
-              IconTheme.merge(
-                data: const IconThemeData(size: 30),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Flexible(child: TutorialAnimationButton(_shakeCard)),
-                    const SizedBox(width: 20),
-                    Flexible(child: swipeLeftButton(controller)),
-                    const SizedBox(width: 20),
-                    Flexible(child: swipeRightButton(controller)),
-                    const SizedBox(width: 20),
-                    Flexible(child: sendProfileButton(controller)),
-                    const SizedBox(width: 20),
-                    Flexible(child: unswipeButton(controller, context)),
-                  ],
+              allUserData.data == null || allUserData.data!.isEmpty
+                  ? Container()
+                  : Padding(
+                padding: const EdgeInsets.only(left:10.0,right: 10),
+                child: IconTheme.merge(
+                  data: const IconThemeData(size: 30),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(child: TutorialAnimationButton(_shakeCard)),
+                      const SizedBox(width: 20),
+                      Flexible(child: swipeLeftButton(controller)),
+                      const SizedBox(width: 20),
+                      Flexible(child: swipeRightButton(controller)),
+                      const SizedBox(width: 20),
+                      Flexible(child: sendProfileButton(controller)),
+                      const SizedBox(width: 20),
+                      Flexible(child: unswipeButton(controller, context)),
+                    ],
+                  ),
                 ),
               )
             ],
@@ -192,27 +224,64 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   }
 
   void _swipeEnd(int previousIndex, int targetIndex, SwiperActivity activity) {
+    if (previousIndex < 0 || previousIndex >= (allUserData.data?.length ?? 0)) {
+      return; // Prevent out-of-bounds errors
+    }
+
+    String? userId = allUserData.data?[previousIndex].id; // Extract user ID
+
     switch (activity) {
       case Swipe():
         log('The card was swiped to the : ${activity.direction}');
-        log('previous index: $previousIndex, target index: $targetIndex');
+        log('Previous index: $previousIndex, Target index: $targetIndex');
+        log('User ID: $userId');
+
+        if (activity.direction == AxisDirection.right) {
+          print("Liked User ID: $userId");
+          hitLikeApi(userId: userId);
+        } else if (activity.direction == AxisDirection.left) {
+          print("Disliked User ID: $userId");
+          hitDislikeApi(userId: userId);
+        }
         break;
+
       case Unswipe():
         log('A ${activity.direction.name} swipe was undone.');
-        log('previous index: $previousIndex, target index: $targetIndex');
+        log('Previous index: $previousIndex, Target index: $targetIndex');
         break;
+
       case CancelSwipe():
         log('A swipe was cancelled');
         break;
+
       case DrivenActivity():
         log('Driven Activity');
         break;
     }
   }
 
+
+  hitLikeApi({required String? userId}) async {
+    if (userId == null) return;
+    print("Liked user with ID: $userId");
+
+  var response =   await WebConfig.likeProfile(likedUserID: userId);
+
+
+  }
   void _onEnd() {
     log('end reached!');
   }
+
+  hitDislikeApi({required String? userId}) async {
+    if (userId == null) return;
+    print("Disliked user with ID: $userId");
+
+    var response =   await WebConfig.disLikedProfile(likedUserID: userId);
+
+  }
+
+
   void _shakeCard() async {
     const double distance = 30;
     await controller.animateTo(
@@ -231,7 +300,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       curve: Curves.easeInOut,
     );
   }
-
 
 // Animates the card back and forth to teach the user that it is swipable.
   // Future<void> _shakeCard() async {

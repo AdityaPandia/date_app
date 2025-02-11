@@ -26,7 +26,7 @@ class Data {
   String? id;
   String? name;
   String? gender;
-  int? birthday;
+  String? birthday;
   String? school;
   String? showMe;
   String? sexialorientation;
@@ -48,7 +48,7 @@ class Data {
   String? email;
   String? status;
   bool? isOnline;
-  Null? ageRange;
+  int? ageRange;
   String? role;
   List<String>? media;
   List<String>? interest;

@@ -312,7 +312,7 @@ class _LocationScreenState extends State<LocationScreen> {
       setState(() {
         place = placemarks[0];
         currentAddress =
-        "${place?.name}, ${place?.locality}, ${place?.administrativeArea}, ${place?.country}";
+        " ${place?.locality}, ${place?.administrativeArea}";
       });
     } catch (e) {
       print("Error fetching address: $e");

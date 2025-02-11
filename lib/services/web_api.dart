@@ -3,15 +3,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:http/http.dart' as http;
 import 'package:seting_app/models/request/create_user_request.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/all_users_response.dart';
 import '../models/login_model_response.dart';
 import '../models/user_model.dart';
+import '../utils/shared_pref/shared_pref_keys.dart';
 import 'network.dart';
 
 class WebConfig {
   static const String baseURL = 'http://15.207.115.155/api';
+
   static String? accessToken;
+  static String? refreshToken;
   static String? userEmail;
+
   static Future<LoginModelResponse?> signInWithEmail({
     required String emailString,
   }) async {
@@ -29,11 +34,19 @@ class WebConfig {
       print("Status Code: ${response.statusCode}");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        var loginResponse = LoginModelResponse.fromJson(jsonDecode(response.body));
+        var loginResponse =
+            LoginModelResponse.fromJson(jsonDecode(response.body));
 
-        accessToken = loginResponse.data?.accessToken;
+        if (loginResponse.data?.accessToken != null &&
+            loginResponse.data?.refreshToken != null) {
+          // Store access and refresh tokens
+          initializeTokens(
+            loginResponse.data!.accessToken!,
+            loginResponse.data!.refreshToken!,
+          );
+        }
+
         userEmail = emailString; // Store email for future login attempts
-
         return loginResponse;
       } else {
         return LoginModelResponse(
@@ -47,95 +60,60 @@ class WebConfig {
     }
   }
 
-  static Future<UserModel?> getProfile({
-    required String accessToken,
-  }) async {
-    Map<String, String> headerParams = {'Authorization': 'Bearer $accessToken'};
-    print('URL: ${'$baseURL/user/profile'}');
+  static initializeTokens(
+      String initialAccessToken, String initialRefreshToken) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    accessToken = initialAccessToken;
+    refreshToken = initialRefreshToken;
+    // Save tokens to SharedPreferences
+    await prefs.setString(
+      SharedPrefsKeys.accessToken,
+      accessToken ?? '',
+    );
+    await prefs.setString(
+      SharedPrefsKeys.refreshToken,
+      refreshToken ?? '',
+    );
+  }
 
-    try {
-      // Initial network request
-      var response = await http.get(
-        Uri.parse('$baseURL/user/profile'),
-        headers: headerParams,
-      );
+  // Function to refresh the access token
+  static Future<bool> refreshAccessToken() async {
+    final response = await http.post(
+      Uri.parse('$baseURL/user/refreshToken'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({"refreshToken": refreshToken}),
+    );
 
-      // Check if access token expired (HTTP 403)
-      if (response.statusCode == 403) {
-        print("Access token expired. Attempting to refresh...");
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body);
+      accessToken = data["data"]["accessToken"];
+      refreshToken = data["data"]["refreshToken"];
+      return true;
+    } else {
+      return false; // Refresh failed, user needs to log in again
+    }
+  }
 
-        // Try refreshing the token automatically (assuming you have a refreshToken)
-        bool loginSuccess = await retryLoginIfUnauthorized(); // Refresh or re-login
+  // Function to handle API requests and retry on token expiration
+  static Future<http.Response?> makeRequest(String endpoint) async {
+    var url = Uri.parse('$baseURL$endpoint');
+    var headers = {'Authorization': 'Bearer $accessToken'};
 
-        if (loginSuccess) {
-          // If login successful, retry the request with the new access token
-          headerParams['Authorization'] = 'Bearer $accessToken'; // Update with new token
-          response = await http.get(
-            Uri.parse('$baseURL/user/profile'),
-            headers: headerParams,
-          );
-        } else {
-          print("Re-login failed. Please log in manually.");
-          return null;
-        }
-      }
+    var response = await http.get(url, headers: headers);
 
-      // Check if response is successful
-      if (response.statusCode == 200) {
-        var profileData = jsonDecode(response.body); // Parse the profile data
-        print("Profile Data: $profileData");
-        return UserModel.fromJson(profileData); // Convert JSON to UserModel
+    if (response.statusCode == 401) {
+      // Token expired
+      bool refreshed = await refreshAccessToken();
+      if (refreshed) {
+        headers['Authorization'] = 'Bearer $accessToken'; // Update token
+        response = await http.get(url, headers: headers); // Retry request
       } else {
-        print("Failed to fetch profile. Status: ${response.statusCode}");
-        return null;
+        return null; // Token refresh failed, user needs to log in again
       }
-    } catch (e) {
-      print("Error in getProfile: $e");
-      return null;
-    }
-  }
-
-  // Function to refresh or retry login in case of 403 error (token expired)
-  static Future<bool> retryLoginIfUnauthorized() async {
-    if (userEmail == null) {
-      print("User email not available. Cannot retry login.");
-      return false;
     }
 
-    var newLoginResponse = await signInWithEmail(emailString: userEmail!);
-    return newLoginResponse?.success ?? false; // Ensure non-null boolean return
+    return response;
   }
-
-
-  // static Future<LoginModelResponse?> signInWithEmail({
-  //   required String emailString,
-  // }) async {
-  //   final String apiUrl = "http://15.207.115.155/api/user/login";
-  //   print("URL: $apiUrl");
-  //
-  //   try {
-  //     final response = await http.post(
-  //       Uri.parse(apiUrl),
-  //       headers: {"Content-Type": "application/json"},
-  //       body: jsonEncode({"email": emailString}),
-  //     );
-  //
-  //     print("Response Body: ${response.body}");
-  //     print("Status Code: ${response.statusCode}");
-  //
-  //     if (response.statusCode == 200 || response.statusCode == 201) {
-  //       return LoginModelResponse.fromJson(jsonDecode(response.body));
-  //     } else {
-  //       return LoginModelResponse(
-  //         success: false,
-  //         code: response.statusCode,
-  //       );
-  //     }
-  //   } catch (e) {
-  //     print("Error occurred in signInWithEmail: $e");
-  //     return null; // Return null in case of an error
-  //   }
-  // }
 
   static Future<dynamic> createUser(CreateUserRequest request) async {
     final String apiUrl = "http://15.207.115.155/api/user/create";
@@ -173,119 +151,127 @@ class WebConfig {
     return loginData;
   }
 
-  // static Future<UserModel?> getProfile({
-  //   required String accessToken,
-  // }) async {
-  //   Map<String, String> headerParams = {'Authorization': 'Bearer $accessToken'};
-  //   print('URL: ${'$baseURL/user/profile'}');
-  //   try {
-  //     NetworkHelper networkHelper = NetworkHelper('$baseURL/user/profile');
-  //     var profileData = await networkHelper.getwithHeader(header: headerParams);
-  //     print("Profile Data: $profileData");
-  //     if (profileData != null) {
-  //       return UserModel.fromJson(profileData); // Convert JSON to Model
-  //     } else {
-  //       return null;
-  //     }
-  //   } catch (e) {
-  //     print("Error in getProfile: $e");
-  //     return null;
-  //   }
-  // }
+  static Future<UserModel?> getProfile({
+    required String accessToken,
+  }) async {
+    Map<String, String> headerParams = {'Authorization': 'Bearer $accessToken'};
+    print('URL: ${'$baseURL/user/profile'}');
+    try {
+      NetworkHelper networkHelper = NetworkHelper('$baseURL/user/profile');
+      var profileData = await networkHelper.getwithHeader(header: headerParams);
+      print("Profile Data: $profileData");
+      if (profileData != null) {
+        return UserModel.fromJson(profileData); // Convert JSON to Model
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print("Error in getProfile: $e");
+      return null;
+    }
+  }
+
   static Future<AllUsersResponse?> getAllUsers({
     required String accessToken,
   }) async {
     Map<String, String> headerParams = {'Authorization': 'Bearer $accessToken'};
     print('URL: ${'$baseURL/user/allUsers?page=1&pageSize=100'}');
-
     try {
-      // Initial network request
-      var response = await http.get(
-        Uri.parse('$baseURL/user/allUsers?page=1&pageSize=100'),
-        headers: headerParams,
-      );
-
-      // Check if access token expired (HTTP 403)
-      if (response.statusCode == 403) {
-        print("Access token expired. Attempting to refresh...");
-
-        // Try refreshing the token automatically (assuming you have a refreshToken)
-        bool loginSuccess = await retryLoginIfUnauthorized(); // Refresh or re-login
-
-        if (loginSuccess) {
-          // If login successful, retry the request with the new access token
-          headerParams['Authorization'] = 'Bearer $accessToken'; // Update with new token
-          response = await http.get(
-            Uri.parse('$baseURL/user/allUsers?page=1&pageSize=100'),
-            headers: headerParams,
-          );
-        } else {
-          print("Re-login failed. Please log in manually.");
-          return null;
-        }
-      }
-
-      // Check if response is successful
-      if (response.statusCode == 200) {
-        var allUserData = jsonDecode(response.body); // Parse the all users data
-        print("All Users Data: $allUserData");
-        return AllUsersResponse.fromJson(allUserData); // Convert JSON to AllUsersResponse
+      NetworkHelper networkHelper =
+          NetworkHelper('$baseURL/user/allUsers?page=1&pageSize=100');
+      var allUserData = await networkHelper.getwithHeader(header: headerParams);
+      print("All Users Data: $allUserData");
+      if (allUserData != null) {
+        return AllUsersResponse.fromJson(allUserData); // Convert JSON to Model
       } else {
-        print("Failed to fetch all users. Status: ${response.statusCode}");
         return null;
       }
     } catch (e) {
-      print("Error in getting all users data: $e");
+      print("Error in getting all user Data: $e");
       return null;
     }
   }
 
-  // static Future<AllUsersResponse?> getAllUsers({
-  //   required String accessToken,
-  // }) async {
-  //   Map<String, String> headerParams = {'Authorization': 'Bearer $accessToken'};
-  //   print('URL: ${'$baseURL/user/allUsers?page=1&pageSize=100'}');
-  //   try {
-  //     NetworkHelper networkHelper =
-  //         NetworkHelper('$baseURL/user/allUsers?page=1&pageSize=100');
-  //     var allUserData = await networkHelper.getwithHeader(header: headerParams);
-  //     print("All Users Data: $allUserData");
-  //     if (allUserData != null) {
-  //       return AllUsersResponse.fromJson(allUserData); // Convert JSON to Model
-  //     } else {
-  //       return null;
-  //     }
-  //   } catch (e) {
-  //     print("Error in getting all user Data: $e");
-  //     return null;
-  //   }
-  // }
-
   //MATCH
   static Future<dynamic> likeProfile({
-    required String accessToken,
     required String likedUserID,
   }) async {
-    Map<String, String> headerParams = {'Authorization': 'Bearer $accessToken'};
-    Map<String, String> bodyParams = {"likeUserId": likedUserID};
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var accessToken = prefs.getString(SharedPrefsKeys.accessToken);
+    try {
+      final response = await http.post(
+        Uri.parse('$baseURL/user/likeProfile'),
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': 'Bearer $accessToken'
+        },
+        body: jsonEncode({"likeUserId": likedUserID}),
+      );
+      print("url: ${'$baseURL/user/likeProfile'}");
+      print("Response Body: ${response.body}");
+      print("Status Code: ${response.statusCode}");
 
-    NetworkHelper networkHelper = NetworkHelper('$baseURL/user/likeProfile');
-    var loginData =
-        await networkHelper.postHeaderBodyData(headerParams, bodyParams);
-    return loginData;
+      if (response.statusCode == 200 || response.statusCode == 201) {
+
+      } else {
+        print("Error occurred while taking action");
+        return null;
+      }
+    } catch (e) {
+      print("Error occurred while taking action: $e");
+      return null;
+    }
+    // Map<String, String> headerParams = {'Authorization': 'Bearer $accessToken'};
+    // Map<String, String> bodyParams = {"likeUserId": likedUserID};
+    // print("url: ${'$baseURL/user/likeProfile'}");
+    // print("bodyParams: $bodyParams and access token : $accessToken");
+    //
+    // NetworkHelper networkHelper = NetworkHelper('$baseURL/user/likeProfile');
+    // var loginData =
+    //     await networkHelper.postHeaderBodyData(headerParams, bodyParams);
+    //
+    // return loginData;
   }
 
   static Future<dynamic> disLikedProfile({
-    required String accessToken,
     required String likedUserID,
   }) async {
-    Map<String, String> headerParams = {'Authorization': 'Bearer $accessToken'};
-    Map<String, String> bodyParams = {"dislikeUserId": likedUserID};
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var accessToken = prefs.getString(SharedPrefsKeys.accessToken);
+    try {
+      final response = await http.post(
+        Uri.parse('$baseURL/user/dislikeProfile'),
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': 'Bearer $accessToken'
+        },
+        body: jsonEncode({"dislikeUserId": likedUserID}),
+      );
+      print("url: ${'$baseURL/user/dislikeProfile'}");
+      print("Response Body: ${response.body}");
+      print("Status Code: ${response.statusCode}");
 
-    NetworkHelper networkHelper = NetworkHelper('$baseURL/user/dislikeProfile');
-    var loginData =
-        await networkHelper.postHeaderBodyData(headerParams, bodyParams);
-    return loginData;
+      if (response.statusCode == 200 || response.statusCode == 201) {
+
+      } else {
+        print("Error occurred while taking action");
+        return null;
+      }
+    } catch (e) {
+      print("Error occurred while taking action: $e");
+      return null;
+    }
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    // var accessToken = prefs.getString(SharedPrefsKeys.accessToken);
+    // Map<String, String> headerParams = {'Authorization': 'Bearer $accessToken'};
+    // Map<String, String> bodyParams = {"dislikeUserId": likedUserID};
+    // print("url: ${'$baseURL/user/dislikeProfile'}");
+    // print("bodyParams: $bodyParams and access token : $accessToken");
+    //
+    // NetworkHelper networkHelper = NetworkHelper('$baseURL/user/dislikeProfile');
+    // var loginData =
+    //     await networkHelper.postHeaderBodyData(headerParams, bodyParams);
+    // return loginData;
   }
 
   static Future<dynamic> getAllMatchesProfile(
@@ -501,5 +487,27 @@ class WebConfig {
     var loginData =
         await networkHelper.postHeaderBodyData(headerParams, bodyParams);
     return loginData;
+  }
+
+  // Function to refresh the access token
+  static Future<bool> logOut() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var email = prefs.getString(SharedPrefsKeys.userEmail);
+    print("email when user is hitting logout Api");
+    final response = await http.post(
+      Uri.parse('$baseURL/user/logout'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({"email": email}),
+    );
+
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body);
+      prefs.setBool(SharedPrefsKeys.isLoggedIn, false);
+      prefs.clear();
+
+      return true;
+    } else {
+      return false; // Refresh failed, user needs to log in again
+    }
   }
 }

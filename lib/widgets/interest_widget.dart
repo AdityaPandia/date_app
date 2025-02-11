@@ -41,12 +41,15 @@ class InterestWidget extends StatelessWidget {
               SizedBox(
                 width: 3.0.w,
               ),
-              Text(
-                title,
-                style: TextStyle(
-                  color:
-                      intrestedList.contains(title) ? whiteColor : blackColor,
-                  fontSize: 15.0,
+              Flexible(
+                child: Text(
+                  title,
+                  softWrap: true,
+                  style: TextStyle(
+                    color:
+                        intrestedList.contains(title) ? whiteColor : blackColor,
+                    fontSize: 15.0,
+                  ),
                 ),
               ),
             ],

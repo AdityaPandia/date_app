@@ -1,21 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../utils/constants.dart';
 
-
 class EditCardWidget extends StatefulWidget {
   final String assetString;
   final String? title;
-  const EditCardWidget(
-      {super.key, required this.assetString, required this.title});
+  bool? isNotSvg;
+  EditCardWidget(
+      {super.key,
+      required this.assetString,
+      required this.title,
+      bool isNotSvg = false});
 
   @override
   State<EditCardWidget> createState() => _EditCardWidgetState();
 }
 
 class _EditCardWidgetState extends State<EditCardWidget> {
+
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -33,7 +41,10 @@ class _EditCardWidgetState extends State<EditCardWidget> {
             padding: const EdgeInsets.all(10.0),
             decoration: const BoxDecoration(
                 color: Color(0XFFf3f1fe), shape: BoxShape.circle),
-            child: SvgPicture.asset(widget.assetString),
+
+            child: (widget.isNotSvg ?? false)
+                ? Image.asset(widget.assetString)
+                : SvgPicture.asset(widget.assetString),
           ),
           SizedBox(
             width: 4.5.w,

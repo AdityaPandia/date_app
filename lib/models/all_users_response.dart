@@ -31,7 +31,7 @@ class AllUserData {
   String? id;
   String? name;
   String? gender;
-  int? birthday;
+  String? birthday;
   String? school;
   String? showMe;
   String? sexialorientation;
@@ -53,7 +53,7 @@ class AllUserData {
   String? email;
   String? status;
   bool? isOnline;
-  Null? ageRange;
+  bool? ageRange;
   String? role;
   List<String>? media;
   List<String>? interest;
