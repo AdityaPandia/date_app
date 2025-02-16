@@ -53,8 +53,8 @@ Widget swipeRightButton(AppinioSwiperController controller) {
             child: SvgPicture.asset(
               "assets/images/like.svg",
               color: CupertinoColors.white,
-              width: 50.0,
-              height: 50.0,
+              width: 30.0,
+              height: 30.0,
             ),
           ),
         ),
@@ -87,8 +87,8 @@ Widget swipeLeftButton(AppinioSwiperController controller) {
           // Increase the button size as we swipe towards it.
           scale: 1 + .1 * horizontalProgress.clamp(0, 1),
           child: Container(
-            height: 70,
-            width: 70,
+            height: 50,
+            width: 50,
             decoration: BoxDecoration(
               color: color,
               shape: BoxShape.circle,
@@ -135,8 +135,8 @@ Widget sendProfileButton(AppinioSwiperController controller) {
           // Increase the button size as we swipe towards it.
           scale: 1 + .1 * horizontalProgress.clamp(0, 1),
           child: Container(
-            height: 70,
-            width: 70,
+            height: 50,
+            width: 50,
             decoration: BoxDecoration(
               color: color,
               shape: BoxShape.circle,
@@ -176,8 +176,8 @@ Widget unswipeButton(AppinioSwiperController controller, BuildContext context) {
       withNavBar: false);
     },
     child: Container(
-      height: 50,
-      width: 50,
+      height: 40,
+      width: 40,
       decoration: BoxDecoration(
         color: Colors.white,
         shape: BoxShape.circle,
@@ -208,8 +208,8 @@ class TutorialAnimationButton extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(12.0),
-        height: 50,
-        width: 50,
+        height: 40,
+        width: 40,
         decoration: BoxDecoration(
             color: Colors.white, shape: BoxShape.circle,
           boxShadow: [

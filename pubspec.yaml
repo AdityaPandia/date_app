@@ -59,6 +59,7 @@ dependencies:
   linear_progress_bar:
   flutter_riverpod:
   carousel_slider:
+  swipe_cards:
 
 
 

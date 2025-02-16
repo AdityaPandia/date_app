@@ -344,7 +344,7 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
                                 style: TextStyle(
                                   color:
                                       isSelected == 0 ? whiteColor : blackColor,
-                                  fontSize: 15.0,
+                                  fontSize: 13.0,
                                 ),
                               ),
                             ),
@@ -376,7 +376,7 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
                                 style: TextStyle(
                                   color:
                                       isSelected == 1 ? whiteColor : blackColor,
-                                  fontSize: 15.0,
+                                  fontSize: 13.0,
                                 ),
                               ),
                             ),
@@ -408,7 +408,7 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
                                 style: TextStyle(
                                   color:
                                       isSelected == 2 ? whiteColor : blackColor,
-                                  fontSize: 15.0,
+                                  fontSize: 13.0,
                                 ),
                               ),
                             ),
@@ -442,7 +442,7 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
                             "All",
                             style: TextStyle(
                               color: isSelected == 3 ? whiteColor : blackColor,
-                              fontSize: 15.0,
+                              fontSize: 13.0,
                             ),
                           ),
                         ),

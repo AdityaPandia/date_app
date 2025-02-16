@@ -4,6 +4,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:seting_app/utils/constants.dart';
 
+import '../utils/constants.dart';
+
 
 class InterestWidget extends StatelessWidget {
   final String svgPath;
@@ -48,7 +50,7 @@ class InterestWidget extends StatelessWidget {
                   style: TextStyle(
                     color:
                         intrestedList.contains(title) ? whiteColor : blackColor,
-                    fontSize: 15.0,
+                    fontSize: 13.0,
                   ),
                 ),
               ),

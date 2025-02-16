@@ -1,0 +1,2 @@
+C:/Work/Freelancing/Chatali_Freelance/seting_app/android/app/.cxx/Debug/4f5a5i62/x86/CMakeFiles/edit_cache.dir
+C:/Work/Freelancing/Chatali_Freelance/seting_app/android/app/.cxx/Debug/4f5a5i62/x86/CMakeFiles/rebuild_cache.dir
