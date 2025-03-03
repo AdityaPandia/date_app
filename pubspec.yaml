@@ -60,6 +60,7 @@ dependencies:
   flutter_riverpod:
   carousel_slider:
   swipe_cards:
+  dio: ^5.8.0+1
 
 
 

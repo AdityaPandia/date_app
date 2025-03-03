@@ -24,6 +24,12 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _checkLoginStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    //here
+    prefs.setString(SharedPrefsKeys.accessToken, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoieG9sb2Z0IiwiaWQiOiJhNGVmNTlkNC0zZmQzLTRlMmEtODlhNi02M2ViMGNmNjFiMzAiLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc0MDA0MTYzMCwiZXhwIjoxNzQwMDUzNjMwfQ.Je9L7tODLXzh2fqJwJhJYajmetYy_8OwaZFmMpLIByM");
+    prefs.setBool(SharedPrefsKeys.isLoggedIn, true);
+
+    //to here
     bool isLoggedIn = prefs.getBool(SharedPrefsKeys.isLoggedIn) ?? false;
     if (isLoggedIn) {
       print("User Logged In : ${isLoggedIn}");

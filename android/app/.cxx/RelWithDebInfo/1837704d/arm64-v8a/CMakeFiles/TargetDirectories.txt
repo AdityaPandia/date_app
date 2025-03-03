@@ -1,0 +1,2 @@
+C:/Work/Freelancing/Chatali_Freelance/seting_app/android/app/.cxx/RelWithDebInfo/1837704d/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Work/Freelancing/Chatali_Freelance/seting_app/android/app/.cxx/RelWithDebInfo/1837704d/arm64-v8a/CMakeFiles/rebuild_cache.dir

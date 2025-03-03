@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:get/get.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:seting_app/utils/routes.dart';
 import 'utils/constants.dart';
@@ -42,7 +43,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ResponsiveSizer(
       builder: (p0, p1, p2) {
-        return MaterialApp(
+        return GetMaterialApp(
           builder: EasyLoading.init(),
           title: 'Seting',
           theme: ThemeData(useMaterial3: true, fontFamily: "SKModernist"),

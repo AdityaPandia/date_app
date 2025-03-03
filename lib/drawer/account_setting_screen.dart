@@ -3,7 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:seting_app/controller/edit_profile_controller.dart';
+import 'package:seting_app/screens/account_setting_update_screen.dart';
+import 'package:seting_app/screens/auth/register/select_communication/communication_screen.dart';
+import 'package:seting_app/screens/auth/register/select_cooking_skills/cooking_skill_screen.dart';
+import 'package:seting_app/screens/auth/register/select_dring/drink_screen.dart';
+import 'package:seting_app/screens/auth/register/select_eating_habit/eating_habit_screen.dart';
+import 'package:seting_app/screens/auth/register/select_excercise/excercise_screen.dart';
+import 'package:seting_app/screens/auth/register/select_height/height_screen.dart';
+import 'package:seting_app/screens/auth/register/select_kids/kids_screen.dart';
+import 'package:seting_app/screens/auth/register/select_night_life/night_life_screen.dart';
+import 'package:seting_app/screens/auth/register/select_qualification/qualification_screen.dart';
+import 'package:seting_app/screens/auth/register/select_relationship/relation_screen.dart';
+import 'package:seting_app/screens/auth/register/select_smoking/smoke_screen.dart';
+import 'package:seting_app/screens/auth/register/select_vacation/vacation_screen.dart';
+import 'package:seting_app/screens/auth/register/select_zodiac/zodiac_sign_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/user_model.dart';
@@ -18,10 +35,10 @@ class AccountSettingScreen extends StatefulWidget {
   const AccountSettingScreen({super.key});
 
   @override
-  State<AccountSettingScreen> createState() => _AccountSettingScreenState();
+  State<AccountSettingScreen> createState() => AccountSettingScreenState();
 }
 
-class _AccountSettingScreenState extends State<AccountSettingScreen> {
+class AccountSettingScreenState extends State<AccountSettingScreen> {
   int isSelected = 0;
   RangeValues _currentRangeValues = const RangeValues(18, 30);
   bool showAge = true;
@@ -37,13 +54,12 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
   String currentAddress = '';
   Placemark? place;
 
-
   String? accessToken;
-
+  final controller = Get.put(EditProfileController());
   @override
   void initState() {
-    getInitData();
-    getAddressFromCoordinates("37.4219983", "-122.084");
+    // getInitData();
+    // getAddressFromCoordinates("37.4219983", "-122.084");
     super.initState();
   }
 
@@ -69,7 +85,6 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
       print("Failed to fetch profile data.");
     }
   }
-  
 
   getAddressFromCoordinates(String lat, String long) async {
     try {
@@ -77,8 +92,7 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
           double.tryParse(lat) ?? 0.0, double.tryParse(long) ?? 0.0);
       setState(() {
         place = placemarks[0];
-        currentAddress =
-        "${place?.locality}, ${place?.administrativeArea}";
+        currentAddress = "${place?.locality}, ${place?.administrativeArea}";
       });
     } catch (e) {
       print("Error fetching address: $e");
@@ -90,6 +104,7 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    controller.fetchProfile();
     return Scaffold(
       backgroundColor: const Color(0XFFf3f1fe),
       appBar: AppBar(
@@ -103,585 +118,919 @@ class _AccountSettingScreenState extends State<AccountSettingScreen> {
               color: primaryColor),
         ),
       ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        scrollDirection: Axis.vertical,
-        padding: EdgeInsets.only(left: 3.5.w, right: 3.5.w),
-        child: Column(
-          children: [
-            SizedBox(
-              height: 1.0.h,
-            ),
-            // Card(
-            //   surfaceTintColor: whiteColor,
-            //   color: whiteColor,
-            //   child: Padding(
-            //     padding: const EdgeInsets.only(
-            //         left: 16.0, right: 16.0, top: 16.0, bottom: 10.0),
-            //     child: Row(
-            //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //       children: [
-            //         const Column(
-            //           mainAxisSize: MainAxisSize.max,
-            //           mainAxisAlignment: MainAxisAlignment.start,
-            //           crossAxisAlignment: CrossAxisAlignment.start,
-            //           children: [
-            //             Align(
-            //               alignment: Alignment.centerLeft,
-            //               child: Text(
-            //                 "My Location Is",
-            //                 style: TextStyle(
-            //                     color: blackColor,
-            //                     fontWeight: FontWeight.bold,
-            //                     fontSize: 16.0),
-            //               ),
-            //             ),
-            //             SizedBox(
-            //               height: 10.0,
-            //             ),
-            //             Text(
-            //               "Tap to set location",
-            //               textAlign: TextAlign.center,
-            //               style: TextStyle(
-            //                   color: Color(0XFF718190), fontSize: 15.0),
-            //             ),
-            //             SizedBox(
-            //               height: 10.0,
-            //             ),
-            //           ],
-            //         ),
-            //         DottedBorder(
-            //           borderType: BorderType.Oval,
-            //           dashPattern: const [3, 2],
-            //           radius: const Radius.circular(12),
-            //           strokeWidth: 1.8,
-            //           color: primaryColor,
-            //           child: Container(
-            //             padding: const EdgeInsets.all(14.0),
-            //             decoration: const BoxDecoration(
-            //                 color: Color(0XFFf3f1fe), shape: BoxShape.circle),
-            //             child: SvgPicture.asset("assets/images/location.svg"),
-            //           ),
-            //         ),
-            //       ],
-            //     ),
-            //   ),
-            // ),
-            Card(
-              color: whiteColor,
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    left: 16.0, right: 16.0, top: 16.0, bottom: 10.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              "My Location Is",
+      body: Obx(
+        () => controller.isLoading.value == 0
+            ? Center(
+                child: const CircularProgressIndicator(),
+              )
+            : controller.isLoading.value == 2
+                ? Text("Error")
+                : SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    scrollDirection: Axis.vertical,
+                    padding: EdgeInsets.only(left: 3.5.w, right: 3.5.w),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 1.0.h,
+                        ),
+                        // Card(
+                        //   surfaceTintColor: whiteColor,
+                        //   color: whiteColor,
+                        //   child: Padding(
+                        //     padding: const EdgeInsets.only(
+                        //         left: 16.0, right: 16.0, top: 16.0, bottom: 10.0),
+                        //     child: Row(
+                        //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        //       children: [
+                        //         const Column(
+                        //           mainAxisSize: MainAxisSize.max,
+                        //           mainAxisAlignment: MainAxisAlignment.start,
+                        //           crossAxisAlignment: CrossAxisAlignment.start,
+                        //           children: [
+                        //             Align(
+                        //               alignment: Alignment.centerLeft,
+                        //               child: Text(
+                        //                 "My Location Is",
+                        //                 style: TextStyle(
+                        //                     color: blackColor,
+                        //                     fontWeight: FontWeight.bold,
+                        //                     fontSize: 16.0),
+                        //               ),
+                        //             ),
+                        //             SizedBox(
+                        //               height: 10.0,
+                        //             ),
+                        //             Text(
+                        //               "Tap to set location",
+                        //               textAlign: TextAlign.center,
+                        //               style: TextStyle(
+                        //                   color: Color(0XFF718190), fontSize: 15.0),
+                        //             ),
+                        //             SizedBox(
+                        //               height: 10.0,
+                        //             ),
+                        //           ],
+                        //         ),
+                        //         DottedBorder(
+                        //           borderType: BorderType.Oval,
+                        //           dashPattern: const [3, 2],
+                        //           radius: const Radius.circular(12),
+                        //           strokeWidth: 1.8,
+                        //           color: primaryColor,
+                        //           child: Container(
+                        //             padding: const EdgeInsets.all(14.0),
+                        //             decoration: const BoxDecoration(
+                        //                 color: Color(0XFFf3f1fe), shape: BoxShape.circle),
+                        //             child: SvgPicture.asset("assets/images/location.svg"),
+                        //           ),
+                        //         ),
+                        //       ],
+                        //     ),
+                        //   ),
+                        // ),
+                        Card(
+                          color: whiteColor,
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                left: 16.0,
+                                right: 16.0,
+                                top: 16.0,
+                                bottom: 10.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Flexible(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(
+                                          "My Location Is",
+                                          style: TextStyle(
+                                              color: blackColor,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16.0),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 10.0),
+                                      Obx(
+                                        () => Text(
+                                          controller.currentAddress.value,
+                                          textAlign: TextAlign.center,
+                                          softWrap: true,
+                                          maxLines: 4,
+                                          style: const TextStyle(
+                                              color: Color(0XFF718190),
+                                              fontSize: 15.0),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 10.0),
+                                    ],
+                                  ),
+                                ),
+                                DottedBorder(
+                                  borderType: BorderType.Oval,
+                                  dashPattern: const [3, 2],
+                                  radius: const Radius.circular(12),
+                                  strokeWidth: 1.8,
+                                  color: primaryColor,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(14.0),
+                                    decoration: const BoxDecoration(
+                                        color: Color(0XFFf3f1fe),
+                                        shape: BoxShape.circle),
+                                    child: SvgPicture.asset(
+                                        AssetsStrings.locationIcon),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 1.0.h,
+                        ),
+                        Card(
+                          surfaceTintColor: whiteColor,
+                          color: whiteColor,
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                left: 16.0,
+                                right: 16.0,
+                                top: 16.0,
+                                bottom: 10.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text(
+                                      "Radius",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16.0),
+                                    ),
+                                    Text(
+                                      "${_value.toStringAsFixed(0)} Km",
+                                      style: const TextStyle(
+                                          color: primaryColor,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16.0),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 10.0,
+                                ),
+                                Slider(
+                                  min: 0,
+                                  max: 1000,
+                                  value: _value,
+                                  activeColor: primaryColor,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _value = value;
+                                    });
+                                  },
+                                ),
+                                const SizedBox(
+                                  height: 10.0,
+                                ),
+                                Row(
+                                  children: [
+                                    Checkbox(
+                                      value: isAnyWhere,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          isAnyWhere = value!;
+                                        });
+                                      },
+                                    ),
+                                    const Text(
+                                      "Anywhere",
+                                      style: TextStyle(
+                                          color: blackColor,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 10.0,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 1.0.h,
+                        ),
+                        Card(
+                          surfaceTintColor: whiteColor,
+                          color: whiteColor,
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                left: 16.0,
+                                right: 16.0,
+                                top: 16.0,
+                                bottom: 10.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "Interested in",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16.0),
+                                ),
+                                const SizedBox(
+                                  height: 10.0,
+                                ),
+                                Obx(
+                                  () => Row(
+                                    children: [
+                                      Expanded(
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            print(
+                                                controller.interestedIn.value);
+                                            controller.interestedIn.value =
+                                                AppStrings.woman;
+                                            print(
+                                                controller.interestedIn.value);
+                                          },
+                                          child: Obx(
+                                            () => Container(
+                                              alignment: Alignment.center,
+                                              padding:
+                                                  const EdgeInsets.all(14.0),
+                                              decoration: BoxDecoration(
+                                                color: controller.interestedIn
+                                                            .value ==
+                                                        AppStrings.woman
+                                                    ? primaryColor
+                                                    : transparentColor,
+                                                borderRadius:
+                                                    BorderRadius.circular(14.0),
+                                                border: Border.all(
+                                                    color: const Color(
+                                                        0XFFE8E6EA)),
+                                              ),
+                                              child: Text(
+                                                AppStrings.woman,
+                                                style: TextStyle(
+                                                  color: controller.interestedIn
+                                                              .value ==
+                                                          AppStrings.woman
+                                                      ? whiteColor
+                                                      : blackColor,
+                                                  fontSize: 13.0,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 4.5.w,
+                                      ),
+                                      Expanded(
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            print(
+                                                controller.interestedIn.value);
+                                            controller.interestedIn.value =
+                                                AppStrings.man;
+                                            print(
+                                                controller.interestedIn.value);
+                                          },
+                                          child: Container(
+                                            alignment: Alignment.center,
+                                            padding: const EdgeInsets.all(14.0),
+                                            decoration: BoxDecoration(
+                                              color: controller
+                                                          .interestedIn.value ==
+                                                      AppStrings.man
+                                                  ? primaryColor
+                                                  : transparentColor,
+                                              borderRadius:
+                                                  BorderRadius.circular(14.0),
+                                              border: Border.all(
+                                                  color:
+                                                      const Color(0XFFE8E6EA)),
+                                            ),
+                                            child: Text(
+                                              AppStrings.man,
+                                              style: TextStyle(
+                                                color: controller.interestedIn
+                                                            .value ==
+                                                        AppStrings.man
+                                                    ? whiteColor
+                                                    : blackColor,
+                                                fontSize: 13.0,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 4.5.w,
+                                      ),
+                                      Expanded(
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            controller.interestedIn.value =
+                                                AppStrings.other;
+                                          },
+                                          child: Container(
+                                            alignment: Alignment.center,
+                                            padding: const EdgeInsets.all(14.0),
+                                            decoration: BoxDecoration(
+                                              color: controller
+                                                          .interestedIn.value ==
+                                                      AppStrings.other
+                                                  ? primaryColor
+                                                  : transparentColor,
+                                              borderRadius:
+                                                  BorderRadius.circular(14.0),
+                                              border: Border.all(
+                                                  color:
+                                                      const Color(0XFFE8E6EA)),
+                                            ),
+                                            child: Text(
+                                              AppStrings.other,
+                                              style: TextStyle(
+                                                color: controller.interestedIn
+                                                            .value ==
+                                                        AppStrings.other
+                                                    ? whiteColor
+                                                    : blackColor,
+                                                fontSize: 13.0,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 10.0,
+                                ),
+                                // GestureDetector(
+                                //   onTap: () {
+                                //     setState(() {
+                                //       isSelected = 3;
+                                //     });
+                                //   },
+                                //   child: Align(
+                                //     alignment: Alignment.center,
+                                //     child: Container(
+                                //       width: 25.0.w,
+                                //       alignment: Alignment.center,
+                                //       padding: const EdgeInsets.all(14.0),
+                                //       decoration: BoxDecoration(
+                                //         color: isSelected == 3
+                                //             ? primaryColor
+                                //             : transparentColor,
+                                //         borderRadius:
+                                //             BorderRadius.circular(14.0),
+                                //         border: Border.all(
+                                //             color: const Color(0XFFE8E6EA)),
+                                //       ),
+                                //       child: Text(
+                                //         "All",
+                                //         style: TextStyle(
+                                //           color: isSelected == 3
+                                //               ? whiteColor
+                                //               : blackColor,
+                                //           fontSize: 13.0,
+                                //         ),
+                                //       ),
+                                //     ),
+                                //   ),
+                                // ),
+                                const SizedBox(
+                                  height: 10.0,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 1.0.h,
+                        ),
+                        Card(
+                          surfaceTintColor: whiteColor,
+                          color: whiteColor,
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                left: 16.0,
+                                right: 16.0,
+                                top: 16.0,
+                                bottom: 10.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Age Range",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16.0),
+                                    ),
+                                    Text(
+                                      controller.ageRange.value.toString(),
+                                      style: TextStyle(
+                                          color: primaryColor,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16.0),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 10.0,
+                                ),
+                                // RangeSlider(
+                                //   values: _currentRangeValues,
+                                //   max: 99,
+                                //   min: 18,
+                                //   activeColor: primaryColor,
+                                //   divisions: 5,
+                                //   labels: RangeLabels(
+                                //     _currentRangeValues.start
+                                //         .round()
+                                //         .toString(),
+                                //     _currentRangeValues.end.round().toString(),
+                                //   ),
+                                //   onChanged: (RangeValues values) {
+                                //     setState(() {
+                                //       _currentRangeValues = values;
+                                //     });
+                                //   },
+                                // ),
+                                const SizedBox(
+                                  height: 10.0,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 1.0.h,
+                        ),
+                        Card(
+                          surfaceTintColor: whiteColor,
+                          color: whiteColor,
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                left: 16.0,
+                                right: 16.0,
+                                top: 16.0,
+                                bottom: 10.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text("Show Age"),
+                                    SizedBox(
+                                      height: 40.0,
+                                      child: Obx(
+                                        () => Switch(
+                                          value: controller.showAge.value,
+                                          onChanged: (value) {
+                                            controller.showAge.value = value;
+                                            print(controller.showAge.value);
+                                          },
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text("Show Location"),
+                                    SizedBox(
+                                      height: 40.0,
+                                      child: Obx(
+                                        () => Switch(
+                                          value: controller.showLocation.value,
+                                          onChanged: (value) {
+                                            controller.showLocation.value =
+                                                value;
+                                          },
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text("Show online Status"),
+                                    SizedBox(
+                                      height: 40.0,
+                                      child: Obx(
+                                        () => Switch(
+                                          value:
+                                              controller.showOnlineStatus.value,
+                                          onChanged: (value) {
+                                            controller.showOnlineStatus.value =
+                                                value;
+                                          },
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 1.0.h,
+                        ),
+                        Obx(
+                          () => GestureDetector(
+                            onTap: () {
+                              Get.to(AccountSettingUpdateScreen(
+                                question: RelationScreen(
+                                    onDataUpdated: (String x, dynamic y) {
+                                      print(y);
+                                      controller.lookingFor.value = y;
+                                    },
+                                    formKey: GlobalKey(),
+                                    onSkip: () {},
+                                    onBack: () {},
+                                    onContinue: () {}),
+                              ));
+                              // Get.to(
+                              // RelationScreen(
+                              //     onDataUpdated: (String x, dynamic y) {},
+                              //     formKey: GlobalKey(),
+                              //     onSkip: () {},
+                              //     onBack: () {},
+                              //     onContinue: () {})
+                              // );
+                            },
+                            child: EditCardWidget(
+                                assetString: "assets/images/what_looking.svg",
+                                title: controller.lookingFor.value),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 1.0.h,
+                        ),
+                        Obx(
+                          () => GestureDetector(
+                            onTap: () {
+                              Get.to(AccountSettingUpdateScreen(
+                                question: ExcerciseScreen(
+                                  onDataUpdated: (String x, dynamic y) {
+                                    print(y);
+                                    controller.exerciseHabbit.value = y;
+                                  },
+                                  formKey: GlobalKey(),
+                                  onSkip: () {},
+                                  onBack: () {},
+                                ),
+                              ));
+                            },
+                            child: EditCardWidget(
+                                assetString: "assets/images/excercise.svg",
+                                title: controller.exerciseHabbit.value),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 1.0.h,
+                        ),
+                        Obx(
+                          () => GestureDetector(
+                            onTap: () {
+                              Get.to(AccountSettingUpdateScreen(
+                                question: VacationScreen(
+                                  onDataUpdated: (String x, dynamic y) {
+                                    print(y);
+                                    controller.idealVocation.value = y;
+                                  },
+                                  formKey: GlobalKey(),
+                                  onSkip: () {},
+                                  onBack: () {},
+                                ),
+                              ));
+                            },
+                            child: EditCardWidget(
+                                assetString: "assets/images/vacation.svg",
+                                title: controller.idealVocation.value),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 1.0.h,
+                        ),
+                        Obx(
+                          () => GestureDetector(
+                            onTap: () {
+                              Get.to(AccountSettingUpdateScreen(
+                                question: SmokeScreen(
+                                  onDataUpdated: (String x, dynamic y) {
+                                    print(y);
+                                    controller.smoking.value = y;
+                                  },
+                                  formKey: GlobalKey(),
+                                  onSkip: () {},
+                                  onBack: () {},
+                                ),
+                              ));
+                            },
+                            child: EditCardWidget(
+                                assetString: "assets/images/smoking.svg",
+                                title: controller.smoking.value),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 1.0.h,
+                        ),
+                        Obx(
+                          () => GestureDetector(
+                            onTap: () {
+                              Get.to(AccountSettingUpdateScreen(
+                                question: EatingHabitScreen(
+                                  onDataUpdated: (String x, dynamic y) {
+                                    print(y);
+                                    controller.eatingHabbit.value = y;
+                                  },
+                                  formKey: GlobalKey(),
+                                  onSkip: () {},
+                                  onBack: () {},
+                                ),
+                              ));
+                            },
+                            child: EditCardWidget(
+                                assetString: "assets/images/eating_habit.svg",
+                                title: controller.eatingHabbit.value),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 1.0.h,
+                        ),
+                        Obx(
+                          () => GestureDetector(
+                            onTap: () {
+                              Get.to(AccountSettingUpdateScreen(
+                                question: HeightScreen(
+                                  onDataUpdated: (String x, dynamic y) {
+                                    print(y);
+                                    controller.height.value = y;
+                                  },
+                                  formKey: GlobalKey(),
+                                  onSkip: () {},
+                                  onBack: () {},
+                                ),
+                              ));
+                            },
+                            child: EditCardWidget(
+                                assetString: AssetsStrings.heightIcon,
+                                title: controller.height.value,
+                                isNotSvg: true),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 1.0.h,
+                        ),
+                        Obx(
+                          () => GestureDetector(
+                            onTap: () {
+                              Get.to(AccountSettingUpdateScreen(
+                                question: KidsScreen(
+                                  onDataUpdated: (String x, dynamic y) {
+                                    print(y);
+                                    controller.aboutKids.value = y;
+                                  },
+                                  formKey: GlobalKey(),
+                                  onSkip: () {},
+                                  onBack: () {},
+                                ),
+                              ));
+                            },
+                            child: EditCardWidget(
+                                assetString: "assets/images/kids.svg",
+                                title: controller.aboutKids.value),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 1.0.h,
+                        ),
+                        Obx(
+                          () => GestureDetector(
+                            onTap: () {
+                              Get.to(AccountSettingUpdateScreen(
+                                question: ZodiacSignScreen(
+                                  onDataUpdated: (String x, dynamic y) {
+                                    print(y);
+                                    controller.zodiacSign.value = y;
+                                  },
+                                  formKey: GlobalKey(),
+                                  onSkip: () {},
+                                  onBack: () {},
+                                ),
+                              ));
+                            },
+                            child: EditCardWidget(
+                                assetString: "assets/images/zodiac_sign.svg",
+                                title: controller.zodiacSign.value),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 1.0.h,
+                        ),
+                        Obx(
+                          () => GestureDetector(
+                            onTap: () {
+                              Get.to(AccountSettingUpdateScreen(
+                                question: QualificationScreen(
+                                  onDataUpdated: (String x, dynamic y) {
+                                    print(y);
+                                    controller.qualification.value = y;
+                                  },
+                                  formKey: GlobalKey(),
+                                  onSkip: () {},
+                                  onBack: () {},
+                                ),
+                              ));
+                            },
+                            child: EditCardWidget(
+                                assetString: "assets/images/qualification.svg",
+                                title: controller.qualification.value),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 1.0.h,
+                        ),
+                        Obx(
+                          () => GestureDetector(
+                            onTap: () {
+                              Get.to(AccountSettingUpdateScreen(
+                                question: NightLifeScreen(
+                                  onDataUpdated: (String x, dynamic y) {
+                                    print(y);
+                                    controller.nightLife.value = y;
+                                  },
+                                  formKey: GlobalKey(),
+                                  onSkip: () {},
+                                  onBack: () {},
+                                ),
+                              ));
+                            },
+                            child: EditCardWidget(
+                                assetString: "assets/images/night_life.svg",
+                                title: controller.nightLife.value),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 1.0.h,
+                        ),
+                        Obx(
+                          () => GestureDetector(
+                            onTap: () {
+                              Get.to(AccountSettingUpdateScreen(
+                                question: CookingSkillScreen(
+                                  onDataUpdated: (String x, dynamic y) {
+                                    print(y);
+                                    controller.cookingSkills.value = y;
+                                  },
+                                  formKey: GlobalKey(),
+                                  onSkip: () {},
+                                  onBack: () {},
+                                ),
+                              ));
+                            },
+                            child: EditCardWidget(
+                                assetString: "assets/images/cooking_skill.svg",
+                                title: controller.cookingSkills.value),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 1.0.h,
+                        ),
+                        Obx(
+                          () => GestureDetector(
+                            onTap: () {
+                              // Get.to(CommunicationScreenEdit());
+                              Get.to(AccountSettingUpdateScreen(
+                                question: DrinkScreen(
+                                  onDataUpdated: (String x, dynamic y) {
+                                    print(y);
+                                    controller.oftenDrink.value = y;
+                                  },
+                                  formKey: GlobalKey(),
+                                  onSkip: () {},
+                                  onBack: () {},
+                                ),
+                              ));
+                            },
+                            child: EditCardWidget(
+                                assetString: "assets/images/drink.svg",
+                                title: controller.oftenDrink.value),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 1.0.h,
+                        ),
+                        Obx(
+                          () => GestureDetector(
+                            onTap: () {
+                              Get.to(AccountSettingUpdateScreen(
+                                question: CommunicationScreen(
+                                  onDataUpdated: (String x, dynamic y) {
+                                    print(y);
+                                    controller.communctionStyle.value = y;
+                                  },
+                                  formKey: GlobalKey(),
+                                  onSkip: () {},
+                                  onBack: () {},
+                                ),
+                              ));
+                            },
+                            child: EditCardWidget(
+                                assetString: "assets/images/communication.svg",
+                                title: controller.communctionStyle.value),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 2.5.h,
+                        ),
+                        MaterialButton(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0)),
+                            minWidth: 90.0.w,
+                            height: 55.0,
+                            color: primaryColor,
+                            child: const Text(
+                              "Apply",
                               style: TextStyle(
-                                  color: blackColor,
+                                  color: whiteColor,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16.0),
                             ),
-                          ),
-                          const SizedBox(height: 10.0),
-                          Text(
-                             currentAddress,
-
-                            textAlign: TextAlign.center,
-                            softWrap: true,
-                            maxLines: 4,
-                            style: const TextStyle(
-                                color: Color(0XFF718190),
-                                fontSize: 15.0),
-                          ),
-                          const SizedBox(height: 10.0),
-                        ],
-                      ),
-                    ),
-                    DottedBorder(
-                      borderType: BorderType.Oval,
-                      dashPattern: const [3, 2],
-                      radius: const Radius.circular(12),
-                      strokeWidth: 1.8,
-                      color: primaryColor,
-                      child: Container(
-                        padding: const EdgeInsets.all(14.0),
-                        decoration: const BoxDecoration(
-                            color: Color(0XFFf3f1fe),
-                            shape: BoxShape.circle),
-                        child: SvgPicture.asset(
-                            AssetsStrings.locationIcon),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 1.0.h,
-            ),
-            Card(
-              surfaceTintColor: whiteColor,
-              color: whiteColor,
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    left: 16.0, right: 16.0, top: 16.0, bottom: 10.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "Radius",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16.0),
-                        ),
-                        Text(
-                          "${_value.toStringAsFixed(0)} Km",
-                          style: const TextStyle(
-                              color: primaryColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16.0),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 10.0,
-                    ),
-                    Slider(
-                      min: 0,
-                      max: 1000,
-                      value: _value,
-                      activeColor: primaryColor,
-                      onChanged: (value) {
-                        setState(() {
-                          _value = value;
-                        });
-                      },
-                    ),
-                    const SizedBox(
-                      height: 10.0,
-                    ),
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: isAnyWhere,
-                          onChanged: (value) {
-                            setState(() {
-                              isAnyWhere = value!;
-                            });
-                          },
-                        ),
-                        const Text(
-                          "Anywhere",
-                          style: TextStyle(
-                              color: blackColor, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 10.0,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 1.0.h,
-            ),
-            Card(
-              surfaceTintColor: whiteColor,
-              color: whiteColor,
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    left: 16.0, right: 16.0, top: 16.0, bottom: 10.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Interested in",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 16.0),
-                    ),
-                    const SizedBox(
-                      height: 10.0,
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                isSelected = 0;
-                              });
-                            },
-                            child: Container(
-                              alignment: Alignment.center,
-                              padding: const EdgeInsets.all(14.0),
-                              decoration: BoxDecoration(
-                                color: isSelected == 0
-                                    ? primaryColor
-                                    : transparentColor,
-                                borderRadius: BorderRadius.circular(14.0),
-                                border:
-                                    Border.all(color: const Color(0XFFE8E6EA)),
-                              ),
-                              child: Text(
-                                AppStrings.woman,
-                                style: TextStyle(
-                                  color:
-                                      isSelected == 0 ? whiteColor : blackColor,
-                                  fontSize: 13.0,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
+                            onPressed: () async {
+                              await controller.patchProfile(
+                                {
+                                  "showMe": controller.interestedIn.value,
+                                  "ageRange": 18,
+                                  "hideBirthday": controller.showAge.value,
+                                  "hideLocation":
+                                      !controller.showLocation.value,
+                                  "hideOnline":
+                                      !controller.showOnlineStatus.value,
+                                  "lookingFor": controller.lookingFor.value,
+                                  "exercise": controller.exerciseHabbit.value,
+                                  "idealVocation":
+                                      controller.idealVocation.value,
+                                  "smoking": controller.smoking.value,
+                                  "eatingHabbit": controller.eatingHabbit.value,
+                                  "height": controller.height.value,
+                                  "aboutKids": controller.aboutKids.value,
+                                  "zodiacSign": controller.zodiacSign.value,
+                                  "qualification":
+                                      controller.qualification.value,
+                                  "nightLife": controller.nightLife.value,
+                                  "cookingSkills":
+                                      controller.cookingSkills.value,
+                                  "oftenDrink": controller.oftenDrink.value,
+                                  "communctionStyle":
+                                      controller.communctionStyle.value,
+                                },
+                              );
+                            }),
                         SizedBox(
-                          width: 4.5.w,
-                        ),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                isSelected = 1;
-                              });
-                            },
-                            child: Container(
-                              alignment: Alignment.center,
-                              padding: const EdgeInsets.all(14.0),
-                              decoration: BoxDecoration(
-                                color: isSelected == 1
-                                    ? primaryColor
-                                    : transparentColor,
-                                borderRadius: BorderRadius.circular(14.0),
-                                border:
-                                    Border.all(color: const Color(0XFFE8E6EA)),
-                              ),
-                              child: Text(
-                                AppStrings.man,
-                                style: TextStyle(
-                                  color:
-                                      isSelected == 1 ? whiteColor : blackColor,
-                                  fontSize: 13.0,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 4.5.w,
-                        ),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                isSelected = 2;
-                              });
-                            },
-                            child: Container(
-                              alignment: Alignment.center,
-                              padding: const EdgeInsets.all(14.0),
-                              decoration: BoxDecoration(
-                                color: isSelected == 2
-                                    ? primaryColor
-                                    : transparentColor,
-                                borderRadius: BorderRadius.circular(14.0),
-                                border:
-                                    Border.all(color: const Color(0XFFE8E6EA)),
-                              ),
-                              child: Text(
-                                AppStrings.other,
-                                style: TextStyle(
-                                  color:
-                                      isSelected == 2 ? whiteColor : blackColor,
-                                  fontSize: 13.0,
-                                ),
-                              ),
-                            ),
-                          ),
+                          height: 1.5.h,
                         ),
                       ],
                     ),
-                    const SizedBox(
-                      height: 10.0,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          isSelected = 3;
-                        });
-                      },
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Container(
-                          width: 25.0.w,
-                          alignment: Alignment.center,
-                          padding: const EdgeInsets.all(14.0),
-                          decoration: BoxDecoration(
-                            color: isSelected == 3
-                                ? primaryColor
-                                : transparentColor,
-                            borderRadius: BorderRadius.circular(14.0),
-                            border: Border.all(color: const Color(0XFFE8E6EA)),
-                          ),
-                          child: Text(
-                            "All",
-                            style: TextStyle(
-                              color: isSelected == 3 ? whiteColor : blackColor,
-                              fontSize: 13.0,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 10.0,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 1.0.h,
-            ),
-            Card(
-              surfaceTintColor: whiteColor,
-              color: whiteColor,
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    left: 16.0, right: 16.0, top: 16.0, bottom: 10.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Age Range",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16.0),
-                        ),
-                        Text(
-                          "18-99",
-                          style: TextStyle(
-                              color: primaryColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16.0),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 10.0,
-                    ),
-                    RangeSlider(
-                      values: _currentRangeValues,
-                      max: 99,
-                      min: 18,
-                      activeColor: primaryColor,
-                      divisions: 5,
-                      labels: RangeLabels(
-                        _currentRangeValues.start.round().toString(),
-                        _currentRangeValues.end.round().toString(),
-                      ),
-                      onChanged: (RangeValues values) {
-                        setState(() {
-                          _currentRangeValues = values;
-                        });
-                      },
-                    ),
-                    const SizedBox(
-                      height: 10.0,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 1.0.h,
-            ),
-            Card(
-              surfaceTintColor: whiteColor,
-              color: whiteColor,
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    left: 16.0, right: 16.0, top: 16.0, bottom: 10.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text("Show Age"),
-                        SizedBox(
-                          height: 40.0,
-                          child: Switch(
-                            value: showAge,
-                            onChanged: (value) {
-                              setState(() {
-                                showAge = value;
-                              });
-                            },
-                          ),
-                        )
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text("Show Location"),
-                        SizedBox(
-                          height: 40.0,
-                          child: Switch(
-                            value: showLocatoin,
-                            onChanged: (value) {
-                              setState(() {
-                                showLocatoin = value;
-                              });
-                            },
-                          ),
-                        )
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text("Show online Status"),
-                        SizedBox(
-                          height: 40.0,
-                          child: Switch(
-                            value: showOnlineStatus,
-                            onChanged: (value) {
-                              setState(() {
-                                showOnlineStatus = value;
-                              });
-                            },
-                          ),
-                        )
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 1.0.h,
-            ),
-            EditCardWidget(
-                assetString: "assets/images/what_looking.svg",
-                title: userData?.data?.lookingFor),
-            SizedBox(
-              height: 1.0.h,
-            ),
-            EditCardWidget(
-                assetString: "assets/images/excercise.svg",
-                title: userData?.data?.exerciseHabbit),
-            SizedBox(
-              height: 1.0.h,
-            ),
-            EditCardWidget(
-                assetString: "assets/images/vacation.svg",
-                title: userData?.data?.idealVocation),
-            SizedBox(
-              height: 1.0.h,
-            ),
-            EditCardWidget(
-                assetString: "assets/images/smoking.svg",
-                title: userData?.data?.smoking),
-            SizedBox(
-              height: 1.0.h,
-            ),
-            EditCardWidget(
-                assetString: "assets/images/eating_habit.svg",
-                title: userData?.data?.eatingHabbit),
-            SizedBox(
-              height: 1.0.h,
-            ),
-            EditCardWidget(
-                assetString: AssetsStrings.heightIcon,
-                title: userData?.data?.height,
-                isNotSvg: true),
-            SizedBox(
-              height: 1.0.h,
-            ),
-            EditCardWidget(
-                assetString: "assets/images/kids.svg",
-                title: userData?.data?.aboutKids),
-            SizedBox(
-              height: 1.0.h,
-            ),
-            EditCardWidget(
-                assetString: "assets/images/zodiac_sign.svg",
-                title: userData?.data?.zodiacSign),
-            SizedBox(
-              height: 1.0.h,
-            ),
-            EditCardWidget(
-                assetString: "assets/images/qualification.svg",
-                title: userData?.data?.school),
-            SizedBox(
-              height: 1.0.h,
-            ),
-            EditCardWidget(
-                assetString: "assets/images/night_life.svg",
-                title: userData?.data?.nightLife),
-            SizedBox(
-              height: 1.0.h,
-            ),
-            EditCardWidget(
-                assetString: "assets/images/cooking_skill.svg",
-                title: userData?.data?.cookingSkills),
-            SizedBox(
-              height: 1.0.h,
-            ),
-            EditCardWidget(
-                assetString: "assets/images/drink.svg",
-                title: userData?.data?.oftenDrink),
-            SizedBox(
-              height: 1.0.h,
-            ),
-            EditCardWidget(
-                assetString: "assets/images/communication.svg",
-                title: userData?.data?.communctionStyle),
-            SizedBox(
-              height: 2.5.h,
-            ),
-            MaterialButton(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0)),
-                minWidth: 90.0.w,
-                height: 55.0,
-                color: primaryColor,
-                child: const Text(
-                  "Apply",
-                  style: TextStyle(
-                      color: whiteColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16.0),
-                ),
-                onPressed: () {}),
-            SizedBox(
-              height: 1.5.h,
-            ),
-          ],
-        ),
+                  ),
       ),
     );
   }

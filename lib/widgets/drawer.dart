@@ -123,7 +123,7 @@ class _DrawerSideBarState extends State<DrawerSideBar> {
             onPressed: () {
               Scaffold.of(context).closeDrawer();
               pushScreen(context,
-                  screen: const EditProfileScreen(), withNavBar: false);
+                  screen:  EditProfileScreen(), withNavBar: false);
             },
             color: whiteColor,
             child: const Row(
